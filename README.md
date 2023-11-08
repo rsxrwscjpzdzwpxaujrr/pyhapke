@@ -5,7 +5,7 @@ pyhapke is an implementation of Hapke's radiative transfer model (Hapke 1981), w
 
 This package is built around the HapkeRTM class, which takes input parameters of incidence, emmittance, and phase angles, as well as phase, and can be used to compute either single scattering albedo or reflectance, given the other. Included constants consist primarily of relevant physical properties of lunar regolith and ice, as well as standard viewing geometries. Each verson of Hapke's model, for bidirectional reflectance, reflectance factor, and radiance factor, is included.
 
-To install, download all files to a folder. From the enclosing folder (NOT the one containing pyproject.toml), run `pip install -e pyhapke` to install the editable version of the package. Pyhapke is not yet available natively on pip.
+To install, download all files to a folder. From the enclosing folder (NOT the one containing pyproject.toml), run `pip install -e pyhapke-main` to install the editable version of the package. Pyhapke is not yet available natively on pip.
 
 To initialize the pyhapke package, use
 
