@@ -17,7 +17,9 @@ classifiers = [
 ]
 dependencies = [
     "numpy",
-    "matplotlib"
+    "matplotlib",
+    "scipy"
+    
 ]
 version = "0.1.0"
 
