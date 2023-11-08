@@ -163,11 +163,11 @@ def compute_P_material(g, material='WAC'):
         return compute_P(g, b=-0.4, c=0.25, format='Legendre')
     if material == 'ice':
         # Pascuzzo et al 2022
-        return compute_P(g, b=0.5, c=0.8, format='HenyeyGreenstein')
+        return compute_P(g, b=0.5, c=0.8, format='HenyeyGreensteinPascuzzo')
     if material == 'WAC':
         b = 0.307
         c = 1
-        return (1 - b**2) / (1 - 2 * b * np.cos(g) + b**2)**(3/2)
+        return compute_P(g, b=b, c=c, format='HenyeyGreenstein')
     else:
         return None
 

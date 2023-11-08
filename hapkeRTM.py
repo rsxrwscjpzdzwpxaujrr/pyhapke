@@ -59,12 +59,12 @@ class HapkeRTM:
         Bs = self.Bs
 
         # Compute H-funct
-        H = compute_H(ssa, mu)
-        H0 = compute_H(ssa, mu0)
+        H = compute_H2(ssa, mu)
+        H0 = compute_H2(ssa, mu0)
 
         #R = (ssa/4) * mu0 / (mu0 + mu) * ((1 + B) * P + H * H0 - 1)
 
-        R = (ssa/4) / (mu0 + mu) * ((1 + Bs * Bs0) * P + H * H0 - 1) * (1 + Bc * Bc0)
+        R = (ssa/4) / (mu0 + mu) * (((1 + Bs * Bs0) * P) + (H * H0 - 1)) * (1 + Bc * Bc0)
 
         return R
     
