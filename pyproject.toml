@@ -1,11 +1,15 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyhapke"
+version = "0.1.0"
 authors = [
     {name = "Jordan Ando", email = "jkando@hawaii.edu"},
+]
+maintainers = [
+    {name = "Christian J. Tai Udovicic", email = "cj.taiudovicic@gmail.com"},
 ]
 description = "Implements Hapke's Radiative Transfer Model"
 readme = "README.md"
@@ -14,6 +18,8 @@ keywords = ["hapke", "spectroscopy", "planetary science"]
 license = {text = "MIT License"}
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
 ]
 dependencies = [
     "numpy",
@@ -21,7 +27,6 @@ dependencies = [
     "scipy"
     
 ]
-version = "0.1.0"
 
 
 [tool.setuptools]
