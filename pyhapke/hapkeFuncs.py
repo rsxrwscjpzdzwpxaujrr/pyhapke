@@ -1,8 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import scipy.optimize
-import scipy
-
 from .constants import *
 
 
@@ -13,11 +9,11 @@ def compute_H(ssa, x):
         ssa (float or np.ndarray): single scattering albedo
         x (float): mu or mu0, i.e. cosines of incidence and emmittence angles
     """
-    y = np.sqrt(1-ssa)
-    r0 = (1-y)/(1+y)
+    y = np.sqrt(1 - ssa)
+    r0 = (1 - y) / (1 + y)
 
-    Hinv = 1 - (1 - y) * x * (r0 + (1 - 0.5 * r0 - r0 * x) * np.log((1+x)/x))
-    return 1/Hinv
+    Hinv = 1 - (1 - y) * x * (r0 + (1 - 0.5 * r0 - r0 * x) * np.log((1 + x) / x))
+    return 1 / Hinv
 
 
 def compute_H2(ssa, x):
@@ -27,20 +23,20 @@ def compute_H2(ssa, x):
         ssa (float or np.ndarray): single scattering albedo
         x (float): mu or mu0, i.e. cosines of incidence and emmittence angles
     """
-    y = np.sqrt(1-ssa)
+    y = np.sqrt(1 - ssa)
 
-    arg = (1+x)/x
-    a = x - 0.5 * x * np.log(arg) - x ** 2 * np.log(arg)
+    arg = (1 + x) / x
+    a = x - 0.5 * x * np.log(arg) - x**2 * np.log(arg)
     b = x * np.log(arg)
 
     num = 1 + y
-    den = 1 + y - a * (1 - y)**2 - b * (1 - y**2)
+    den = 1 + y - a * (1 - y) ** 2 - b * (1 - y**2)
 
-    return num/den
+    return num / den
 
 
-def compute_Bs(poros, g=np.pi/6, hs = None):
-    """ Computes the opposition effect B(g), using Hapke 9.22
+def compute_Bs(poros, g=np.pi / 6, hs=None):
+    """Computes the opposition effect B(g), using Hapke 9.22
 
     Args:
         g (float or list_like, default = np.pi/6): phase angle
@@ -51,11 +47,11 @@ def compute_Bs(poros, g=np.pi/6, hs = None):
     if hs is None:
         O = poros
         B0 = 1
-        h = -3/8 * np.log(1 - O)
+        h = -3 / 8 * np.log(1 - O)
 
-        return B0/(1 + (1/h) * np.tan(g/2))
+        return B0 / (1 + (1 / h) * np.tan(g / 2))
     else:
-        return 1/(1 + np.tan(g/2)/hs)
+        return 1 / (1 + np.tan(g / 2) / hs)
 
 
 def convert_oc_to_ssa(wl, n, k, D):
@@ -71,21 +67,23 @@ def convert_oc_to_ssa(wl, n, k, D):
         _type_: _description_
     """
 
-    alpha = 4 * np.pi * n * k/wl
-    Dave = 2/3 * (n ** 2 - ((n ** 2 - 1) ** (3/2))/n) * D
+    alpha = 4 * np.pi * n * k / wl
+    Dave = 2 / 3 * (n**2 - ((n**2 - 1) ** (3 / 2)) / n) * D
 
-    se = ((n - 1) ** 2 + k ** 2)/((n + 1) ** 2 + k ** 2) + 0.05
+    se = ((n - 1) ** 2 + k**2) / ((n + 1) ** 2 + k**2) + 0.05
 
-    si = 1 - 4/(n * (n + 1) ** 2)
+    si = 1 - 4 / (n * (n + 1) ** 2)
     Theta = np.exp(-alpha * Dave)
 
-    ssa = se + (1 - se) * ((1 - si) * Theta)/(1 - si * Theta)
+    ssa = se + (1 - se) * ((1 - si) * Theta) / (1 - si * Theta)
 
     return ssa
 
 
-def compute_mixed_P(Mis, ssas, Ps=[P_WAC, P_ICE], densities=[RHO_REG, RHO_ICE], diameters=[D_REG, D_ICE]):
-    """ Compute the mixed phase function of different materials (especially ice and regolith). Default parameters
+def compute_mixed_P(
+    Mis, ssas, Ps=[P_WAC, P_ICE], densities=[RHO_REG, RHO_ICE], diameters=[D_REG, D_ICE]
+):
+    """Compute the mixed phase function of different materials (especially ice and regolith). Default parameters
     contain values for phase function P, density, and diameter for regolith and ice, in that order.
 
     Args:
@@ -108,14 +106,16 @@ def compute_mixed_P(Mis, ssas, Ps=[P_WAC, P_ICE], densities=[RHO_REG, RHO_ICE], 
         ssa = ssas[i]
         d = diameters[i]
 
-        num += M * P * ssa/(rho * d)
-        den += M * ssa/(rho * d)
+        num += M * P * ssa / (rho * d)
+        den += M * ssa / (rho * d)
 
-    return num/den
+    return num / den
 
 
-def compute_mixed_ssa(Mis, ssas, densities=[RHO_REG, RHO_ICE], diameters=[D_REG, D_ICE]):
-    """ Compute the mixed single scattering albedo  of different materials (especially ice and regolith). Default parameters
+def compute_mixed_ssa(
+    Mis, ssas, densities=[RHO_REG, RHO_ICE], diameters=[D_REG, D_ICE]
+):
+    """Compute the mixed single scattering albedo  of different materials (especially ice and regolith). Default parameters
     contain values density, and diameter for regolith and ice, in that order.
 
     Args:
@@ -136,61 +136,56 @@ def compute_mixed_ssa(Mis, ssas, densities=[RHO_REG, RHO_ICE], diameters=[D_REG,
         ssa = ssas[i]
         d = diameters[i]
 
-        num += M * ssa/(rho * d)
+        num += M * ssa / (rho * d)
         den += M / (rho * d)
-    return num/den
+    return num / den
 
 
-def compute_P(g, b, c, format='Legendre'):
-    if format == 'Legendre':
-        P = 1 + b * np.cos(g) + c * (1.5 * np.cos(g)**2 - 0.5)
-    elif format == 'HenyeyGreensteinPascuzzo':
-        P = (1-c) * (1 - b**2) / (1 - 2 * b * np.cos(g) + b**2) ** (3/2) + \
-            c * (1 - b**2) / (1 + 2 * b * np.cos(g) + b**2)**(3/2)
+def compute_P(g, b, c, format="Legendre"):
+    if format == "Legendre":
+        P = 1 + b * np.cos(g) + c * (1.5 * np.cos(g) ** 2 - 0.5)
+    elif format == "HenyeyGreensteinPascuzzo":
+        P = (1 - c) * (1 - b**2) / (1 - 2 * b * np.cos(g) + b**2) ** (3 / 2) + c * (
+            1 - b**2
+        ) / (1 + 2 * b * np.cos(g) + b**2) ** (3 / 2)
     elif format == "HenyeyGreenstein":
-        P = (1+c)/2 * (1 - b**2) / ((1 - 2 * b * np.cos(g) + b**2) ** (3/2)) + \
-            (1-c)/2 * (1 - b**2) / ((1 + 2 * b * np.cos(g) + b**2)**(3/2))
-        
+        P = (1 + c) / 2 * (1 - b**2) / (
+            (1 - 2 * b * np.cos(g) + b**2) ** (3 / 2)
+        ) + (1 - c) / 2 * (1 - b**2) / ((1 + 2 * b * np.cos(g) + b**2) ** (3 / 2))
     else:
         return None
-
     return P
 
 
-def compute_P_material(g, material='WAC'):
-    if material == 'regolith':
+def compute_P_material(g, material="WAC"):
+    if material == "regolith":
         # Mustard and Peters, 1981
-        return compute_P(g, b=-0.4, c=0.25, format='Legendre')
-    if material == 'ice':
+        return compute_P(g, b=-0.4, c=0.25, format="Legendre")
+    if material == "ice":
         # Pascuzzo et al 2022
-        return compute_P(g, b=0.5, c=0.8, format='HenyeyGreensteinPascuzzo')
-    if material == 'WAC':
+        return compute_P(g, b=0.5, c=0.8, format="HenyeyGreensteinPascuzzo")
+    if material == "WAC":
         b = 0.307
         c = 1
-        return compute_P(g, b=b, c=c, format='HenyeyGreenstein')
+        return compute_P(g, b=b, c=c, format="HenyeyGreenstein")
     else:
         return None
 
 
-def compute_Bc(g, hc=0.064/0.72):
-
+def compute_Bc(g, hc=0.064 / 0.72):
     if isinstance(g, np.ndarray):
         out = []
-
         for gi in g:
-
             if gi == 0:
                 out.append(1)
             else:
-
-                zeta = np.tan(gi/2)/hc
-                out.append((1 + (1 - np.exp(-zeta))/zeta)/(2 * (1 + zeta)**2))
-
+                zeta = np.tan(gi / 2) / hc
+                out.append((1 + (1 - np.exp(-zeta)) / zeta) / (2 * (1 + zeta) ** 2))
         print(out)
         return np.array(out)
     else:
         if g == 0:
             return 1
         else:
-            zeta = np.tan(g/2)/hc
-            return ((1 + (1 - np.exp(-zeta))/zeta)/(2 * (1 + zeta)**2))
+            zeta = np.tan(g / 2) / hc
+            return (1 + (1 - np.exp(-zeta)) / zeta) / (2 * (1 + zeta) ** 2)
