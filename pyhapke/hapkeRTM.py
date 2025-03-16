@@ -152,9 +152,9 @@ class HapkeRTM:
 
         return R
 
-    def hapke_function_BDRF(self, ssa):
+    def hapke_function_BRDF(self, ssa):
         """Function R(omega), assuming other parameters are known. This is
-        the BDRF version of the function (Hapke equation 10.5), computing Bi-Directional Reflectance
+        the BRDF version of the function (Hapke equation 10.5), computing Bi-Directional Reflectance
 
         Args:
             ssa (float or nd.array): single scattering albedo
@@ -227,10 +227,10 @@ class HapkeRTM:
                 Rpred = self.hapke_function_REFF(ssa)
                 return Rpred - R
 
-        elif model == "BDRF":
+        elif model == "BRDF":
 
             def obj_func(ssa, R):
-                Rpred = self.hapke_function_BDRF(ssa)
+                Rpred = self.hapke_function_BRDF(ssa)
                 return Rpred - R
 
         elif model == "RADF":
