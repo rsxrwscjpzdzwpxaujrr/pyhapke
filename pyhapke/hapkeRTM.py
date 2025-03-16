@@ -49,12 +49,13 @@ class HapkeRTM:
 
         pass
 
-    def hapke_function_REFF(self, ssa):
+    def hapke_function_REFF(self, ssa, h_func=compute_H2):
         """Function R(omega), assuming other parameters are known. This is
         the REFF version of the function (Hapke equation 10.4), computing the reflectance factor (reflectance coefficient)
 
         Args:
             ssa (float or nd.array): single scattering albedo
+            h_func (function(ssa, x)): the function used to calculate the Chandrasekhar's H function. Defaults to compute_H2
 
         Returns:
             float or nd.array: Reflectance factor
@@ -69,8 +70,8 @@ class HapkeRTM:
         Bs = self.Bs
 
         # Compute H-funct
-        H = compute_H2(ssa, mu)
-        H0 = compute_H2(ssa, mu0)
+        H = h_func(ssa, mu)
+        H0 = h_func(ssa, mu0)
 
         # R = (ssa/4) * mu0 / (mu0 + mu) * ((1 + B) * P + H * H0 - 1)
 
@@ -83,13 +84,14 @@ class HapkeRTM:
 
         return R
 
-    def hapke_function_RADF(self, ssa):
+    def hapke_function_RADF(self, ssa, h_func=compute_H):
         """Function R(omega), assuming other parameters are known. This is
         the RADF version of the function (Hapke equation 10.5), which computes I/F radiance.
 
         Args:
             ssa (float or nd.array): single scattering albedo
             OE: Type of backscatter opposition effect. Use None for lab data, CBOE for WAC albedo
+            h_func (function(ssa, x)): the function used to calculate the Chandrasekhar's H function. Defaults to compute_H
 
         Returns:
             float or nd.array: I/F radiance
@@ -103,8 +105,8 @@ class HapkeRTM:
         Bs = self.Bs
 
         # Compute H-funct
-        H = compute_H(ssa, mu)
-        H0 = compute_H(ssa, mu0)
+        H = h_func(ssa, mu)
+        H0 = h_func(ssa, mu0)
 
         # R = (ssa/4) * mu0 / (mu0 + mu) * ((1 + B) * P + H * H0 - 1)
 
@@ -118,12 +120,13 @@ class HapkeRTM:
 
         return R
 
-    def hapke_function_RedR(self, ssa):
+    def hapke_function_RedR(self, ssa, h_func=compute_H):
         """Function R_r(omega), assuming other parameters are known. This is
         equal to RADF/ the Lommel Seeliger factor
 
         Args:
             ssa (float or nd.array): single scattering albedo
+            h_func (function(ssa, x)): the function used to calculate the Chandrasekhar's H function. Defaults to compute_H
 
         Returns:
             float or nd.array: I/F radiance
@@ -144,20 +147,21 @@ class HapkeRTM:
             Bc0 = .456"""
 
         # Compute H-funct
-        H = compute_H(ssa, mu)
-        H0 = compute_H(ssa, mu0)
+        H = h_func(ssa, mu)
+        H0 = h_func(ssa, mu0)
 
         # R = (ssa/4) * mu0 / (mu0 + mu) * ((1 + B) * P + H * H0 - 1)
         R = (ssa / 4) * ((1 + Bs * Bs0) * P + H * H0 - 1) * (1 + Bc * Bc0)
 
         return R
 
-    def hapke_function_BDRF(self, ssa):
+    def hapke_function_BDRF(self, ssa, h_func=compute_H2):
         """Function R(omega), assuming other parameters are known. This is
         the BDRF version of the function (Hapke equation 10.5), computing Bi-Directional Reflectance
 
         Args:
             ssa (float or nd.array): single scattering albedo
+            h_func (function(ssa, x)): the function used to calculate the Chandrasekhar's H function. Defaults to compute_H2
 
         Returns:
             float or nd.array: Bidirectional reflectance distribution factor
@@ -171,8 +175,8 @@ class HapkeRTM:
         Bs = self.Bs
 
         # Compute H-funct
-        H = compute_H2(ssa, mu)
-        H0 = compute_H2(ssa, mu0)
+        H = h_func(ssa, mu)
+        H0 = h_func(ssa, mu0)
 
         # R = (ssa/4) * mu0 / (mu0 + mu) * ((1 + B) * P + H * H0 - 1)
 
@@ -180,11 +184,12 @@ class HapkeRTM:
 
         return R
 
-    def hapke_function(self, ssa):
+    def hapke_function(self, ssa, h_func=compute_H2):
         """Function R(omega), assuming other parameters are known, where R is bidirectional reflectance
 
         Args:
             ssa (float or nd.array): single scattering albedo
+            h_func (function(ssa, x)): the function used to calculate the Chandrasekhar's H function. Defaults to compute_H2
 
         Returns:
             float or nd.array: Bidirectional reflectance
@@ -197,8 +202,8 @@ class HapkeRTM:
         Bc = self.Bc
         Bs = self.Bs
         # Compute H-funct
-        H = compute_H2(ssa, mu)
-        H0 = compute_H2(ssa, mu0)
+        H = h_func(ssa, mu)
+        H0 = h_func(ssa, mu0)
 
         # R = (ssa/4) * mu0 / (mu0 + mu) * ((1 + B) * P + H * H0 - 1)
         R = (
@@ -211,7 +216,7 @@ class HapkeRTM:
 
         return R
 
-    def compute_ssa_from_R(self, R, method="lm", model="RADF"):
+    def compute_ssa_from_R(self, R, method="lm", model="RADF", h_func=compute_H):
         """Compute single scattering albedo given reflectance or radiance and input. By default, uses Levenberg-Marquardt algorithm as part of
         scipy.optimize.root. Hybr method (scipy default) not recommended, due to difficulty of finding simualted jacobian.
 
@@ -219,36 +224,37 @@ class HapkeRTM:
             R (float or nd.array): Reflectance
             method (str, optional): Root finding method from scipy.optimize.root. Defaults to 'lm'.
             model (function, optional): Version of Hapke's model to compute ssa from. Defaults to hapke_function_REFF.
+            h_func (function(ssa, x)): the function used to calculate the Chandrasekhar's H function. Defaults to compute_H
         """
 
         if model == "REFF":
 
             def obj_func(ssa, R):
-                Rpred = self.hapke_function_REFF(ssa)
+                Rpred = self.hapke_function_REFF(ssa, h_func)
                 return Rpred - R
 
         elif model == "BDRF":
 
             def obj_func(ssa, R):
-                Rpred = self.hapke_function_BDRF(ssa)
+                Rpred = self.hapke_function_BDRF(ssa, h_func)
                 return Rpred - R
 
         elif model == "RADF":
 
             def obj_func(ssa, R):
-                Rpred = self.hapke_function_RADF(ssa)
+                Rpred = self.hapke_function_RADF(ssa, h_func)
                 return Rpred - R
 
         elif model == "RedR":
 
             def obj_func(ssa, R):
-                Rpred = self.hapke_function_RedR(ssa)
+                Rpred = self.hapke_function_RedR(ssa, h_func)
                 return Rpred - R
 
         elif model is None:
 
             def obj_func(ssa, R):
-                Rpred = self.hapke_function(ssa)
+                Rpred = self.hapke_function(ssa, h_func)
                 return Rpred - R
 
         if type(R) is np.ndarray:
